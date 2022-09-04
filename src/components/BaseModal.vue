@@ -22,6 +22,10 @@ export default {
 
   methods: {
     ...mapActions(useCharactersList, ["manageFavouriteList"]),
+    
+  /**
+   * Closes character modal
+   */
     closeModal() {
       this.is_visible = false;
       this.selectedCharacter = null;
@@ -56,11 +60,17 @@ export default {
               <dt>location:</dt>
               <dd>{{ this.selectedCharacterData.location.name }}</dd>
               <dt>episode:</dt>
-              <dd v-for="episode in this.selectedCharacterData.episode" :key="episode">{{ `${this.selectedCharacterData.episode.name} (${this.selectedCharacterData.episode.episode}) - ${this.selectedCharacterData.air_date}`  }}</dd>
+              <dd>
+                <ul class="episode">
+                  <li v-for="episode in this.selectedCharacterData.episode" :key="episode">{{
+                  `${episode.name} (${episode.episode})`}} <small><em>{{`${episode.air_date}`}}</em></small>
+                  </li>
+                </ul>
+              </dd>
             </dl>
             <button type="button" @click.prevent="this.manageFavouriteList()">{{
-                `${this.favouriteCharactersArray.includes(this.selectedCharacter) ? 'Remove' : 'Add'}`
-            }} to favourite list</button>
+            `${this.favouriteCharactersArray.includes(this.selectedCharacter) ? 'Remove from' : 'Add to'}`
+            }} favourite list</button>
           </div>
         </div>
       </div>
@@ -79,7 +89,6 @@ export default {
   justify-content: center;
   align-items: flex-start;
   transition: all 0.5s ease-in-out;
-
   height: 100%;
   width: 100%;
 
@@ -94,7 +103,7 @@ export default {
   .content {
     position: relative;
     background-color: #fff;
-    width: 90%;
+    width: 95%;
     margin-top: 1rem;
     z-index: 1000;
     max-height: 96vh;
@@ -107,7 +116,7 @@ export default {
     }
 
     @media (min-width: 1280px) {
-      width: 33.333333%;
+      width: 50%;
     }
 
     .close {
@@ -117,11 +126,19 @@ export default {
     }
 
     .body {
-      display: flex;
-      align-items: flex-start;
+      margin-top: 2rem;
+
+      @media (min-width: 600px) {
+        display: flex;
+        align-items: flex-start;
+      }
 
       &>div {
         margin-left: 1rem;
+      }
+
+      .episode {
+        margin: 0
       }
     }
   }

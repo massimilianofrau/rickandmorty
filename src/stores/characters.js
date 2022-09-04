@@ -33,6 +33,10 @@ export const useCharactersList = defineStore("characters", {
   },
 
   actions: {
+  /**
+   * Fetch characters list
+   * @param {String} url=https://rickandmortyapi.com/api/character - URL of endpoint
+   */
     async fetchCharactersList(
       url = "https://rickandmortyapi.com/api/character"
     ) {
@@ -62,7 +66,12 @@ export const useCharactersList = defineStore("characters", {
 
       this.fetching = false;
     },
-    async fetchCharacterData(id = this.selectedCharacter) {
+
+  /**
+   * Fetch character's data
+   * @param {Number} id = this.selectedCharacter - ID of selected character
+   */
+      async fetchCharacterData(id = this.selectedCharacter) {
       if (!id) {
         console.error("Error loading character: Missing ID");
         return;
@@ -74,11 +83,18 @@ export const useCharactersList = defineStore("characters", {
       );
       try {
         const result = await response.json();
-        if (
-          this.selectedCharacterData.episode &&
-          this.selectedCharacterData.episode.length > 0
-        ) {
-          this.selectedCharacterData.episode.forEach(async (singleEpisode, index) => {
+        this.selectedCharacterData = result;
+      } catch (err) {
+        console.error("Error loading character's data:", err);
+        return {};
+      }
+
+      if (
+        this.selectedCharacterData.episode &&
+        this.selectedCharacterData.episode.length > 0
+      ) {
+        await this.selectedCharacterData.episode.forEach(
+          async (singleEpisode, index) => {
             this.fetching = true;
             const response = await fetch(singleEpisode);
             try {
@@ -88,16 +104,16 @@ export const useCharactersList = defineStore("characters", {
               console.error("Error loading episode:", err);
               return err;
             }
-          });
-        }
-        this.selectedCharacterData = result;
-      } catch (err) {
-        console.error("Error loading character's data:", err);
-        return {};
+          }
+        );
       }
-
       this.fetching = false;
     },
+
+  /**
+   * Add/remove characters from favourite list
+   * @param {Number} id = this.selectedCharacter - ID of selected character
+   */
     manageFavouriteList(id = this.selectedCharacter) {
       if (!id) {
         console.error("Error managing favourite list.");
