@@ -1,42 +1,39 @@
 <script setup>
-import {useCharactersList} from "../stores/characters.js";
-import {useRoute, useRouter} from "vue-router";
-import {mapState, mapActions, mapWritableState} from 'pinia';
+import { useCharactersList } from "../stores/characters.js";
+import { useRoute, useRouter } from "vue-router";
+import { mapState, mapActions, mapWritableState } from "pinia";
 </script>
 
 <script>
 export default {
   computed: {
     ...mapState(useCharactersList, {
-      charactersList: 'results',
-      info: 'info',
-      selectedCharacterData: 'selectedCharacterData'
+      charactersList: "results",
+      info: "info",
+      selectedCharacterData: "selectedCharacterData",
+      favouriteCharactersList: "favouriteCharactersList",
+      favouriteCharactersArray: "favouriteCharactersArray"
     }),
     ...mapWritableState(useCharactersList, {
-      is_visible: 'modal'
-    })
+      selectedCharacter: "selectedCharacter",
+      is_visible: "modal",
+    }),
   },
 
   methods: {
+    ...mapActions(useCharactersList, ["manageFavouriteList"]),
     closeModal() {
       this.is_visible = false;
-    }
-  },
+      this.selectedCharacter = null;
+    },
 
-  created() {
-    // when the template is created, we call this action
-    console.log(this.selectedCharacterData);
-  }
+  },
 };
 </script>
 
 <template>
   <transition name="fade">
-    <div
-        class="modal"
-        v-if="this.is_visible"
-        v-bind="$attrs"
-    >
+    <div class="modal" v-if="this.is_visible" v-bind="$attrs">
       <!-- backdrop -->
       <div class="backdrop"></div>
 
@@ -46,17 +43,32 @@ export default {
 
         <!-- body della modale -->
         <div class="body">
-          <h4></h4>
+          <img :src="this.selectedCharacterData.image" :alt="this.selectedCharacterData.name" />
+          <div>
+            <h3>{{ this.selectedCharacterData.name }}</h3>
+            <dl>
+              <dt>status:</dt>
+              <dd>{{ this.selectedCharacterData.status }}</dd>
+              <dt>gender:</dt>
+              <dd>{{ this.selectedCharacterData.gender }}</dd>
+              <dt>origin:</dt>
+              <dd>{{ this.selectedCharacterData.origin.name }}</dd>
+              <dt>location:</dt>
+              <dd>{{ this.selectedCharacterData.location.name }}</dd>
+              <dt>episode:</dt>
+              <dd v-for="episode in this.selectedCharacterData.episode" :key="episode">{{ `${this.selectedCharacterData.episode.name} (${this.selectedCharacterData.episode.episode}) - ${this.selectedCharacterData.air_date}`  }}</dd>
+            </dl>
+            <button type="button" @click.prevent="this.manageFavouriteList()">{{
+                `${this.favouriteCharactersArray.includes(this.selectedCharacter) ? 'Remove' : 'Add'}`
+            }} to favourite list</button>
+          </div>
         </div>
-        body
       </div>
     </div>
   </transition>
 </template>
 
 <style lang="scss" scoped>
-
-
 .modal {
   position: fixed;
   top: 0;
@@ -66,7 +78,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  transition: all .50s ease-in-out;
+  transition: all 0.5s ease-in-out;
 
   height: 100%;
   width: 100%;
@@ -77,16 +89,15 @@ export default {
     background-color: rgba(0, 0, 0, 0.4);
     width: 100%;
     height: 100%;
-
   }
 
   .content {
     position: relative;
-    background-color: #FFF;
+    background-color: #fff;
     width: 90%;
     margin-top: 1rem;
     z-index: 1000;
-    max-height:96vh;
+    max-height: 96vh;
     overflow-y: auto;
     padding: 1rem;
     border-radius: 0.25rem;
@@ -96,13 +107,22 @@ export default {
     }
 
     @media (min-width: 1280px) {
-        width: 33.333333%;
+      width: 33.333333%;
     }
 
     .close {
       position: absolute;
       right: 1rem;
       top: 1rem;
+    }
+
+    .body {
+      display: flex;
+      align-items: flex-start;
+
+      &>div {
+        margin-left: 1rem;
+      }
     }
   }
 
@@ -126,6 +146,3 @@ export default {
   }
 }
 </style>
-
-
-

@@ -1,6 +1,6 @@
 import {createRouter} from 'vue-router'
 import Homepage from './home/Home.vue';
-import Characters from './characters/Characters.vue';
+import FavouriteCharacters from './favourite-characters/FavouriteCharacters.vue';
 
 const routes = [
   {
@@ -9,8 +9,8 @@ const routes = [
   },
 
   {
-    path: '/characters/',
-    component: Characters
+    path: '/favourite-characters/',
+    component: FavouriteCharacters
   },
 ]
 
